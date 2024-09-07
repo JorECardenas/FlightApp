@@ -87,7 +87,6 @@ class FlightappApplicationTests {
 
 			System.out.println(success.toString());
 
-			success.getData().
 
 		} catch (Exception e) {
 			throw new RuntimeException(e);

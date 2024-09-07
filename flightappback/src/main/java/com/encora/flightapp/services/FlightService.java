@@ -1,53 +1,62 @@
 package com.encora.flightapp.services;
 
+import com.encora.flightapp.models.FlightDetails;
+import com.encora.flightapp.models.auth.AuthBody;
+import com.encora.flightapp.models.auth.AuthToken;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import io.swagger.client.ApiResponse;
+import io.swagger.client.model.FlightOffer;
 import io.swagger.client.model.Success;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestClient;
 
 //import org.threeten.bp.OffsetDateTime;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class FlightService {
 
 
-    @Value("${api.url.test}")
-    private String url;
+    private String API_URL = "https://242b3e58-84fd-435b-ba58-5b7589261386.mock.pstmn.io";
 
     @Value("${api.credential.secret")
-    private String credential;
+    private String CLIENT_SECRET;
 
     @Value("${api.credential.id}")
-    private String id;
+    private String CLIENT_ID;
+
+    private final int MAX_FLIGHTS = 5;
 
     private final RestClient client;
 
-    public FlightService(RestClient.Builder builder){
+    public FlightService(RestClient.Builder builder) {
 
-        this.client = builder.baseUrl(url).build();
+        this.client = builder.baseUrl(API_URL).build();
 
     }
 
 
-
-    private JSONObject parseData(String json){
+    private JSONObject parseData(String json) {
 
 
         JSONParser parser = new JSONParser();
-        try{
+        try {
             JSONObject obj = (JSONObject) parser.parse(json);
 
             JSONArray data = (JSONArray) obj.get("data");
@@ -59,15 +68,35 @@ public class FlightService {
         }
 
 
-
-
     }
 
 
-    private String getToken(){
-        String data = client.get().uri(url + "/v1/security/oauth2/token").retrieve().body(String.class);
+    private String getToken() {
 
-        return "token";
+        String GRANT_TYPE = "client_credentials";
+        AuthBody body = new AuthBody(CLIENT_ID, CLIENT_SECRET, GRANT_TYPE);
+
+
+        String data = client.post().uri("/v1/security/oauth2/token").body(body).retrieve().body(String.class);
+
+        ObjectMapper mapper = getPerfectObjectMapper();
+
+        String authToken = "";
+
+        try{
+
+            AuthToken token = mapper.readValue(data, AuthToken.class);
+
+            authToken = token.getAccess_token();
+
+
+        }catch (Exception e){
+            throw new RuntimeException();
+        }
+
+
+
+        return authToken;
     }
 
     public ObjectMapper getPerfectObjectMapper() {
@@ -85,7 +114,7 @@ public class FlightService {
 
 
         SimpleModule module = new SimpleModule();
-        module.addDeserializer(LocalDate.class, new CustomDateDeserializer());
+        module.addDeserializer(LocalDateTime.class, new CustomDateDeserializer());
         mapper.registerModule(module);
 
         return mapper;
@@ -93,33 +122,74 @@ public class FlightService {
     }
 
 
-    public String getFromAPI(){
-        String data = client.get().uri(url + "/v2/shopping/flight-offers").retrieve().body(String.class);
+    private List<FlightDetails> parseData(List<FlightOffer> data){
 
-        System.out.println(data);
 
-        ObjectMapper mapper = getPerfectObjectMapper();
+        List<FlightDetails> flights = new ArrayList<>();
 
-        try{
-            Success success = mapper.readValue(data, Success.class);
+        for(FlightOffer offer: data){
 
-            System.out.println(success.toString());
+            flights.add(new FlightDetails(offer));
 
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
 
 
-
-        return data;
-
-
+        return flights;
 
 
 
 
     }
 
+    public List<FlightDetails> getFromAPI(String DepAirport,
+                                          String ArrAirport,
+                                          String DepDate,
+                                          String ArrDate,
+                                          int NumAdults,
+                                          String Currency,
+                                          boolean NonStop) {
+
+        //String token = getToken();
+
+        String data = client.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/v2/shopping/flight-offers")
+                        .queryParam("originLocationCode", DepAirport)
+                        .queryParam("destinationLocationCode", ArrAirport)
+                        .queryParam("departureDate", DepDate)
+                        .queryParam("returnDate", ArrDate)
+                        .queryParam("adults", NumAdults)
+                        .queryParam("currencyCode", Currency)
+                        .queryParam("nonStop", NonStop)
+                        .queryParam("max", MAX_FLIGHTS)
+                        .build()
+                )
+                //.header("Authorization", "Bearer " + token)
+                .retrieve()
+                .body(String.class);
+
+
+        ObjectMapper mapper = getPerfectObjectMapper();
+
+        List<FlightDetails> flights = new ArrayList<>();
+
+        try {
+            Success success = mapper.readValue(data, Success.class);
+
+            flights = parseData(success.getData());
+
+
+
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+
+        return flights;
+
+
+    }
 
 
 }

@@ -12,7 +12,7 @@
 
 package io.swagger.client.model;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Arrays;
 
@@ -25,7 +25,7 @@ import com.google.gson.stream.JsonWriter;
 import io.swagger.client.model.OriginalFlightEndPoint;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.IOException;
-//import org.threeten.bp.LocalDate;
+//import org.threeten.bp.LocalDateTime;
 /**
  * departure or arrival information
  */
@@ -35,9 +35,9 @@ import java.io.IOException;
 public class FlightEndPoint extends OriginalFlightEndPoint {
   //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'hh:mm:ss")
   @SerializedName("at")
-  private LocalDate at = null;
+  private LocalDateTime at = null;
 
-  public FlightEndPoint at(LocalDate at) {
+  public FlightEndPoint at(LocalDateTime at) {
     this.at = at;
     return this;
   }
@@ -47,11 +47,11 @@ public class FlightEndPoint extends OriginalFlightEndPoint {
    * @return at
   **/
   @Schema(description = "local date and time in [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) YYYY-MM-ddThh:mm:ss format, e.g. 2017-02-10T20:40:00")
-  public LocalDate getAt() {
+  public LocalDateTime getAt() {
     return at;
   }
 
-  public void setAt(LocalDate at) {
+  public void setAt(LocalDateTime at) {
     this.at = at;
   }
 

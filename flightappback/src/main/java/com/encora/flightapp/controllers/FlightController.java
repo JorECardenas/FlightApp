@@ -1,5 +1,6 @@
 package com.encora.flightapp.controllers;
 
+import com.encora.flightapp.models.FlightDetails;
 import com.encora.flightapp.services.FlightService;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.json.simple.JSONObject;
@@ -19,6 +20,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Date;
+import java.util.List;
 
 
 @RestController
@@ -36,18 +38,18 @@ public class FlightController {
 
 
     @GetMapping("/getFlights")
-    public String getFlightData(@RequestParam String DepAirport,
-                                @RequestParam String ArrAirport,
-                                @RequestParam String DepDate,
-                                @RequestParam String ArrDate,
-                                @RequestParam int NumAdults,
-                                @RequestParam String Currency,
-                                @RequestParam boolean NonStop) {
+    public List<FlightDetails> getFlightData(@RequestParam String DepAirport,
+                                             @RequestParam String ArrAirport,
+                                             @RequestParam String DepDate,
+                                             @RequestParam String ArrDate,
+                                             @RequestParam int NumAdults,
+                                             @RequestParam String Currency,
+                                             @RequestParam boolean NonStop) {
 
 
 
 
-        return flightService.getFromAPI();
+        return flightService.getFromAPI(DepAirport, ArrAirport, DepDate, ArrDate, NumAdults, Currency, NonStop);
 
 
     }
