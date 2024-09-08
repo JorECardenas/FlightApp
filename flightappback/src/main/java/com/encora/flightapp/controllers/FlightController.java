@@ -8,6 +8,7 @@ import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.web.client.RestClientBuilderConfigurer;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,7 +23,7 @@ import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 
-
+@CrossOrigin("*")
 @RestController
 public class FlightController {
 
@@ -41,13 +42,13 @@ public class FlightController {
     public List<FlightDetails> getFlightData(@RequestParam String DepAirport,
                                              @RequestParam String ArrAirport,
                                              @RequestParam String DepDate,
-                                             @RequestParam String ArrDate,
+                                             @RequestParam(value = "", required = false) String ArrDate,
                                              @RequestParam int NumAdults,
                                              @RequestParam String Currency,
-                                             @RequestParam boolean NonStop) {
+                                             @RequestParam(value = "false", required = false) boolean NonStop) {
 
 
-
+        System.out.println("Called");
 
         return flightService.getFromAPI(DepAirport, ArrAirport, DepDate, ArrDate, NumAdults, Currency, NonStop);
 
