@@ -1,5 +1,6 @@
 package com.encora.flightapp.services;
 
+import com.encora.flightapp.models.AirportDictionaryItem;
 import com.encora.flightapp.models.FlightDetails;
 import com.encora.flightapp.models.auth.AuthBody;
 import com.encora.flightapp.models.auth.AuthToken;
@@ -10,15 +11,19 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.swagger.client.ApiResponse;
-import io.swagger.client.model.FlightOffer;
-import io.swagger.client.model.Success;
+import io.swagger.client.model.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestTemplate;
 
 //import org.threeten.bp.OffsetDateTime;
 import java.time.LocalDate;
@@ -34,6 +39,7 @@ public class FlightService {
 
 
     private String API_URL = "https://242b3e58-84fd-435b-ba58-5b7589261386.mock.pstmn.io";
+    //private String API_URL = "https://test.api.amadeus.com";
 
     @Value("${api.credential.secret")
     private String CLIENT_SECRET;
@@ -52,48 +58,41 @@ public class FlightService {
     }
 
 
-    private JSONObject parseData(String json) {
-
-
-        JSONParser parser = new JSONParser();
-        try {
-            JSONObject obj = (JSONObject) parser.parse(json);
-
-            JSONArray data = (JSONArray) obj.get("data");
-
-            return obj;
-        } catch (Exception e) {
-            System.out.println(e.toString());
-            return null;
-        }
-
-
-    }
-
-
     private String getToken() {
 
         String GRANT_TYPE = "client_credentials";
         AuthBody body = new AuthBody(CLIENT_ID, CLIENT_SECRET, GRANT_TYPE);
 
+        HttpHeaders headers = new HttpHeaders();
 
-        String data = client.post().uri("/v1/security/oauth2/token").body(body).retrieve().body(String.class);
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        ObjectMapper mapper = getPerfectObjectMapper();
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+        map.add("grant_type", GRANT_TYPE);
+        map.add("client_id", CLIENT_ID);
+        map.add("client_secret", CLIENT_SECRET);
 
         String authToken = "";
 
-        try{
+        try {
+            String data = client.post()
+                    .uri("/v1/security/oauth2/token")
+                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                    .body(map)
+                    .retrieve()
+                    .body(String.class);
+
+            ObjectMapper mapper = getPerfectObjectMapper();
+
 
             AuthToken token = mapper.readValue(data, AuthToken.class);
 
             authToken = token.getAccess_token();
 
 
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException();
         }
-
 
 
         return authToken;
@@ -121,13 +120,63 @@ public class FlightService {
 
     }
 
+    private List<AirportDictionaryItem> getDictionary(Dictionaries dicts) {
 
-    private List<FlightDetails> parseData(List<FlightOffer> data){
+        LocationEntry locations = dicts.getLocations();
+
+        List<AirportDictionaryItem> names = new ArrayList<>();
+
+        ObjectMapper mapper = getPerfectObjectMapper();
+
+        //String token = getToken();
+
+        for (String key : locations.keySet()) {
+
+            LocationValue loc = locations.get(key);
+
+            io.swagger.city.Success data = client.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/v1/reference-data/locations")
+                            .queryParam("subType", "CITY")
+                            .queryParam("keyword", loc.getCityCode())
+                            .queryParam("countryCode", loc.getCountryCode())
+                            .queryParam("view", "LIGHT")
+                            .build()
+                    )
+                    //.header("Authorization", "Bearer " + token)
+                    .retrieve()
+                    .body(io.swagger.city.Success.class);
+
+            if (data != null && data.getData().isEmpty()) {
+                continue;
+            }
+
+            names.add(new AirportDictionaryItem(data.getData().getFirst().getId(),
+                    data.getData().getFirst().getIataCode(),
+                    data.getData().getFirst().getName()));
+
+
+
+
+        }
+
+        System.out.println(names);
+
+        return names;
+
+
+    }
+
+
+    private List<FlightDetails> parseData(List<FlightOffer> data, Dictionaries dicts) {
+
+
+        List<AirportDictionaryItem> airports = getDictionary(dicts);
 
 
         List<FlightDetails> flights = new ArrayList<>();
 
-        for(FlightOffer offer: data){
+        for (FlightOffer offer : data) {
 
             flights.add(new FlightDetails(offer));
 
@@ -135,8 +184,6 @@ public class FlightService {
 
 
         return flights;
-
-
 
 
     }
@@ -176,9 +223,7 @@ public class FlightService {
         try {
             Success success = mapper.readValue(data, Success.class);
 
-            flights = parseData(success.getData());
-
-
+            flights = parseData(success.getData(), success.getDictionaries());
 
 
         } catch (Exception e) {
