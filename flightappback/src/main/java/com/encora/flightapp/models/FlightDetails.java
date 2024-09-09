@@ -6,6 +6,7 @@ import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Data
 public class FlightDetails {
@@ -17,7 +18,7 @@ public class FlightDetails {
     PriceInfo priceInfo;
 
 
-    public FlightDetails(FlightOffer offer){
+    public FlightDetails(FlightOffer offer, Map<String,AirportDictionaryItem> dict){
 
         id = offer.getId();
 
@@ -25,7 +26,7 @@ public class FlightDetails {
 
         for(Itineraries it: offer.getItineraries()){
 
-            segments.add(new SegmentInfo(it, offer.getTravelerPricings()));
+            segments.add(new SegmentInfo(it, offer.getTravelerPricings(), dict));
 
         }
 

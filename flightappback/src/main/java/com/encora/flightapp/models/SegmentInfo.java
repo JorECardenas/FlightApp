@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Data
 public class SegmentInfo {
@@ -39,7 +40,7 @@ public class SegmentInfo {
 
 
 
-    public SegmentInfo(Itineraries segment, List<TravelerPricing> pricings){
+    public SegmentInfo(Itineraries segment, List<TravelerPricing> pricings, Map<String,AirportDictionaryItem> dict){
 
         time = segment.getDuration();
 
@@ -47,16 +48,39 @@ public class SegmentInfo {
 
         arrDate = segment.getSegments().getLast().getArrival().getAt();
 
+        if(dict.get(segment.getSegments().getFirst().getDeparture().getIataCode()) == null){
+            depAirport = segment.getSegments().getFirst().getDeparture().getIataCode();
+        }else {
+            depAirport = dict.get(segment.getSegments().getFirst().getDeparture().getIataCode()).getCity() + " (" + segment.getSegments().getFirst().getDeparture().getIataCode() +")";
 
-        depAirport = segment.getSegments().getFirst().getDeparture().getIataCode();
+        }
 
-        arrAirport = segment.getSegments().getLast().getArrival().getIataCode();
+        if(dict.get(segment.getSegments().getLast().getArrival().getIataCode()) == null){
+            arrAirport = segment.getSegments().getLast().getArrival().getIataCode();
+        }else {
+            arrAirport = dict.get(segment.getSegments().getLast().getArrival().getIataCode()).getCity() + " (" + segment.getSegments().getLast().getArrival().getIataCode() +")";
+
+        }
+
+
+        //arrAirport = dict.get(segment.getSegments().getLast().getArrival().getIataCode()).getCity() + " (" + segment.getSegments().getLast().getArrival().getIataCode() +")";
+
 
         stops = new ArrayList<>();
 
         for(int i = 1; i <= segment.getSegments().size() - 1; i++){
 
+            System.out.println(segment.getSegments().get(i).getDeparture().getIataCode());
+
             String airport = segment.getSegments().get(i).getDeparture().getIataCode();
+
+            if(dict.get(segment.getSegments().get(i).getDeparture().getIataCode()) != null){
+                airport = dict.get(segment.getSegments().get(i).getDeparture().getIataCode()).getCity() + " (" + segment.getSegments().get(i).getDeparture().getIataCode() +")";
+
+            }
+
+            //String airport = dict.get(segment.getSegments().get(i).getDeparture().getIataCode()).getCity() + " (" + segment.getSegments().getFirst().getDeparture().getIataCode() +")";
+
 
             LocalDateTime start = segment.getSegments().get(i - 1).getArrival().getAt();
             LocalDateTime end = segment.getSegments().get(i).getDeparture().getAt();

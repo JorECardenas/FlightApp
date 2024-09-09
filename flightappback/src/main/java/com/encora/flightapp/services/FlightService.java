@@ -26,26 +26,30 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestTemplate;
 
 //import org.threeten.bp.OffsetDateTime;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class FlightService {
 
 
-    private String API_URL = "https://242b3e58-84fd-435b-ba58-5b7589261386.mock.pstmn.io";
-    //private String API_URL = "https://test.api.amadeus.com";
+    //private String API_URL = "https://242b3e58-84fd-435b-ba58-5b7589261386.mock.pstmn.io";
+    private final String API_URL = "https://test.api.amadeus.com";
 
     @Value("${api.credential.secret")
     private String CLIENT_SECRET;
 
     @Value("${api.credential.id}")
     private String CLIENT_ID;
+
+    private String token = "";
+
+    private Instant lastRequest = Instant.now();
 
     private final int MAX_FLIGHTS = 5;
 
@@ -60,42 +64,28 @@ public class FlightService {
 
     private String getToken() {
 
-        String GRANT_TYPE = "client_credentials";
-        AuthBody body = new AuthBody(CLIENT_ID, CLIENT_SECRET, GRANT_TYPE);
-
-        HttpHeaders headers = new HttpHeaders();
-
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-        map.add("grant_type", GRANT_TYPE);
-        map.add("client_id", CLIENT_ID);
-        map.add("client_secret", CLIENT_SECRET);
-
-        String authToken = "";
-
-        try {
-            String data = client.post()
-                    .uri("/v1/security/oauth2/token")
-                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                    .body(map)
-                    .retrieve()
-                    .body(String.class);
-
-            ObjectMapper mapper = getPerfectObjectMapper();
-
-
-            AuthToken token = mapper.readValue(data, AuthToken.class);
-
-            authToken = token.getAccess_token();
-
-
-        } catch (Exception e) {
-            throw new RuntimeException();
+        if(Instant.now().isAfter(lastRequest) ){
+            return token;
         }
 
 
-        return authToken;
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
+        requestBody.add("grant_type", "client_credentials");
+        requestBody.add("client_id", "ni6eYBIZ7R0GsESEYwolDtPlIn0rD8GD");
+        requestBody.add("client_secret", "aGjopDNeMnJA0bRJ");
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(requestBody, headers);
+
+        ResponseEntity<AuthToken> response = restTemplate.exchange(API_URL + "/v1/security/oauth2/token", HttpMethod.POST, requestEntity, AuthToken.class);
+
+        token = Objects.requireNonNull(response.getBody()).getAccess_token();
+
+        return token;
     }
 
     public ObjectMapper getPerfectObjectMapper() {
@@ -120,19 +110,21 @@ public class FlightService {
 
     }
 
-    private List<AirportDictionaryItem> getDictionary(Dictionaries dicts) {
+    private Map<String, AirportDictionaryItem> getDictionary(Dictionaries dicts) {
 
         LocationEntry locations = dicts.getLocations();
 
-        List<AirportDictionaryItem> names = new ArrayList<>();
+        Map<String, AirportDictionaryItem> map = new HashMap<>();
 
-        ObjectMapper mapper = getPerfectObjectMapper();
+        String token = getToken();
 
-        //String token = getToken();
+        System.out.println(locations.keySet());
 
         for (String key : locations.keySet()) {
 
             LocationValue loc = locations.get(key);
+
+            System.out.println(loc);
 
             io.swagger.city.Success data = client.get()
                     .uri(uriBuilder -> uriBuilder
@@ -143,7 +135,7 @@ public class FlightService {
                             .queryParam("view", "LIGHT")
                             .build()
                     )
-                    //.header("Authorization", "Bearer " + token)
+                    .header("Authorization", "Bearer " + token)
                     .retrieve()
                     .body(io.swagger.city.Success.class);
 
@@ -151,7 +143,8 @@ public class FlightService {
                 continue;
             }
 
-            names.add(new AirportDictionaryItem(data.getData().getFirst().getId(),
+
+            map.put(data.getData().getFirst().getIataCode() ,new AirportDictionaryItem(data.getData().getFirst().getId(),
                     data.getData().getFirst().getIataCode(),
                     data.getData().getFirst().getName()));
 
@@ -160,9 +153,9 @@ public class FlightService {
 
         }
 
-        System.out.println(names);
 
-        return names;
+
+        return map;
 
 
     }
@@ -171,14 +164,14 @@ public class FlightService {
     private List<FlightDetails> parseData(List<FlightOffer> data, Dictionaries dicts) {
 
 
-        List<AirportDictionaryItem> airports = getDictionary(dicts);
+        Map<String,AirportDictionaryItem> airports = getDictionary(dicts);
 
 
         List<FlightDetails> flights = new ArrayList<>();
 
         for (FlightOffer offer : data) {
 
-            flights.add(new FlightDetails(offer));
+            flights.add(new FlightDetails(offer, airports));
 
         }
 
@@ -196,7 +189,7 @@ public class FlightService {
                                           String Currency,
                                           boolean NonStop) {
 
-        //String token = getToken();
+        String token = getToken();
 
         String data = client.get()
                 .uri(uriBuilder -> uriBuilder
@@ -211,7 +204,7 @@ public class FlightService {
                         .queryParam("max", MAX_FLIGHTS)
                         .build()
                 )
-                //.header("Authorization", "Bearer " + token)
+                .header("Authorization", "Bearer " + token)
                 .retrieve()
                 .body(String.class);
 
@@ -221,6 +214,7 @@ public class FlightService {
         List<FlightDetails> flights = new ArrayList<>();
 
         try {
+
             Success success = mapper.readValue(data, Success.class);
 
             flights = parseData(success.getData(), success.getDictionaries());
