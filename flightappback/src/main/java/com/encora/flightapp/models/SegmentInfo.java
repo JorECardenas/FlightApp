@@ -70,8 +70,6 @@ public class SegmentInfo {
 
         for(int i = 1; i <= segment.getSegments().size() - 1; i++){
 
-            System.out.println(segment.getSegments().get(i).getDeparture().getIataCode());
-
             String airport = segment.getSegments().get(i).getDeparture().getIataCode();
 
             if(dict.get(segment.getSegments().get(i).getDeparture().getIataCode()) != null){

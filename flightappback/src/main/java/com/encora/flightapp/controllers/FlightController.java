@@ -47,9 +47,6 @@ public class FlightController {
                                              @RequestParam String Currency,
                                              @RequestParam(value = "false", required = false) boolean NonStop) {
 
-
-        System.out.println("Called");
-
         return flightService.getFromAPI(DepAirport, ArrAirport, DepDate, ArrDate, NumAdults, Currency, NonStop);
 
 

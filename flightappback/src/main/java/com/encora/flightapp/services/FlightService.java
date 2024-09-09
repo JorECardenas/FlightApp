@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestTemplate;
 
@@ -32,7 +33,10 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
 import java.text.SimpleDateFormat;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class FlightService {
@@ -49,7 +53,7 @@ public class FlightService {
 
     private String token = "";
 
-    private Instant lastRequest = Instant.now();
+    private Instant expires = Instant.now();
 
     private final int MAX_FLIGHTS = 5;
 
@@ -61,10 +65,9 @@ public class FlightService {
 
     }
 
-
     private String getToken() {
 
-        if(Instant.now().isAfter(lastRequest) ){
+        if(Instant.now().isBefore(expires) ){
             return token;
         }
 
@@ -84,6 +87,7 @@ public class FlightService {
         ResponseEntity<AuthToken> response = restTemplate.exchange(API_URL + "/v1/security/oauth2/token", HttpMethod.POST, requestEntity, AuthToken.class);
 
         token = Objects.requireNonNull(response.getBody()).getAccess_token();
+        expires = Instant.now().plus(1499, ChronoUnit.SECONDS);
 
         return token;
     }
@@ -118,35 +122,45 @@ public class FlightService {
 
         String token = getToken();
 
-        System.out.println(locations.keySet());
-
         for (String key : locations.keySet()) {
 
             LocationValue loc = locations.get(key);
 
-            System.out.println(loc);
 
-            io.swagger.city.Success data = client.get()
-                    .uri(uriBuilder -> uriBuilder
-                            .path("/v1/reference-data/locations")
-                            .queryParam("subType", "CITY")
-                            .queryParam("keyword", loc.getCityCode())
-                            .queryParam("countryCode", loc.getCountryCode())
-                            .queryParam("view", "LIGHT")
-                            .build()
-                    )
-                    .header("Authorization", "Bearer " + token)
-                    .retrieve()
-                    .body(io.swagger.city.Success.class);
+            try{
+                ResponseEntity<io.swagger.city.Success1> data = client.get()
+                        .uri(uriBuilder -> uriBuilder
+                                .path("/v1/reference-data/locations")
+                                .path("/{cityId}")
+                                .build("C" + loc.getCityCode())
+                        )
+                        .header("Authorization", "Bearer " + token)
+                        .retrieve()
+                        .toEntity(io.swagger.city.Success1.class);
 
-            if (data != null && data.getData().isEmpty()) {
+
+
+
+                map.put(data.getBody().getData().getIataCode() ,
+                        new AirportDictionaryItem(data.getBody().getData().getId(),
+                                data.getBody().getData().getIataCode(),
+                                data.getBody().getData().getName())
+                );
+
+
+                Instant sleep = Instant.now().plus(100, TimeUnit.MILLISECONDS.toChronoUnit());
+
+                while(Instant.now().isBefore(sleep)){
+                    continue;
+                }
+            }catch (HttpClientErrorException e){
                 continue;
+
+
+
             }
 
 
-            map.put(data.getData().getFirst().getIataCode() ,new AirportDictionaryItem(data.getData().getFirst().getId(),
-                    data.getData().getFirst().getIataCode(),
-                    data.getData().getFirst().getName()));
 
 
 
@@ -159,7 +173,6 @@ public class FlightService {
 
 
     }
-
 
     private List<FlightDetails> parseData(List<FlightOffer> data, Dictionaries dicts) {
 
