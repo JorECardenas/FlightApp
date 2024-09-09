@@ -14,9 +14,16 @@ const callAPI = async ({ request }:any) => {
 
   let data = await request.formData();
 
+  let depAirport = data.get("depAirport") as string
+  let arrAirport = data.get("arrAirport") as string
+
+  const regex = /\((.*)\)/
+
+
+
   const params2 = {
-    DepAirport: data.get("depAirport"),
-    ArrAirport: data.get("arrAirport"),
+    DepAirport: depAirport.match(regex)?.pop(),
+    ArrAirport: arrAirport.match(regex)?.pop(),
     DepDate: data.get("depDate"),
     ArrDate: data.get("arrDate"),
     NumAdults: data.get("numAdults"),
@@ -25,6 +32,7 @@ const callAPI = async ({ request }:any) => {
 
   }
 
+  console.log(params2)
 
 
   let res = await axios({
@@ -54,12 +62,7 @@ const router = createBrowserRouter([
     path: '/results',
     action: callAPI,
     element: <ResultsComponent />,
-    children: [
-      {
-        path:"/details/:id",
-        element: <DetailsComponent/>
-      }
-    ]
+   
   }
 ])
 

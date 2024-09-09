@@ -8,6 +8,7 @@ import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.web.client.RestClientBuilderConfigurer;
+import org.springframework.boot.autoconfigure.web.format.DateTimeFormatters;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,8 +21,13 @@ import java.io.FileReader;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 @CrossOrigin("*")
 @RestController
@@ -36,8 +42,6 @@ public class FlightController {
     }
 
 
-
-
     @GetMapping("/getFlights")
     public List<FlightDetails> getFlightData(@RequestParam String DepAirport,
                                              @RequestParam String ArrAirport,
@@ -47,7 +51,31 @@ public class FlightController {
                                              @RequestParam String Currency,
                                              @RequestParam(value = "false", required = false) boolean NonStop) {
 
-        return flightService.getFromAPI(DepAirport, ArrAirport, DepDate, ArrDate, NumAdults, Currency, NonStop);
+        SimpleDateFormat parser = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+
+        try{
+            String formattedDepDate = formatter.format(parser.parse(DepDate));
+
+            String formattedArrDate = null;
+
+            if (!ArrDate.isBlank() && !ArrDate.isEmpty()) {
+                formattedArrDate = formatter.format(parser.parse(ArrDate));;
+            }
+
+            return flightService.getFromAPI(DepAirport,
+                    ArrAirport,
+                    formattedDepDate,
+                    formattedArrDate,
+                    NumAdults,
+                    Currency,
+                    NonStop);
+        }catch (ParseException e){
+            throw new RuntimeException(e.toString());
+        }
+
+
 
 
     }

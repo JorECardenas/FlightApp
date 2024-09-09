@@ -21,7 +21,7 @@ export default function SegmentInfoComponent({ segment }: IProps) {
 
         const m = Math.floor(formated.minutes())
 
-        return h + " hours " + (m > 0 ? m + " min" : "")
+        return (h > 0 ? h + " hours" : "") + " " + (m > 0 ? m + " min" : "")
 
 
     }

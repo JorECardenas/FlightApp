@@ -3,7 +3,8 @@ import dayjs, { Dayjs } from "dayjs";
 import { Form } from "react-router-dom";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { useState } from "react";
-import { Button, Checkbox, InputLabel, TextField } from "@mui/material";
+import { Autocomplete, Button, Checkbox, InputLabel, TextField } from "@mui/material";
+import data from "../../Models/Data/airlineData.json"
 
 
 export default function SearchForm() {
@@ -17,18 +18,31 @@ export default function SearchForm() {
         <LocalizationProvider dateAdapter={AdapterDayjs}>
             <Form method="post" action="/results" className="container flex flex-col gap-2 p-3">
 
-
-                <TextField
-                    label="Departure Airport"
-                    name="depAirport"
-                    placeholder="Departure Airport"
+                <Autocomplete
+                    disablePortal
+                    options={data.codes}
+                    renderInput={(params) => (
+                        <TextField
+                            {...params}
+                            label="Departure Airport"
+                            name="depAirport"
+                            placeholder="Departure Airport"
+                        />
+                    )}
                 />
 
-                <TextField
-                    label="Arrival Airport"
-                    id={"arrAir"}
-                    name="arrAirport"
-                    placeholder="Arrival Airport"
+                <Autocomplete
+                    disablePortal
+                    options={data.codes}
+                    renderInput={(params) => (
+                        <TextField
+                            {...params}
+                            label="Arrival Airport"
+                            id={"arrAir"}
+                            name="arrAirport"
+                            placeholder="Arrival Airport"
+                        />
+                    )}
                 />
 
                 <DatePicker
