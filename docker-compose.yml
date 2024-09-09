@@ -1,0 +1,11 @@
+services:
+  flightapp-back:
+    image: "flightapp-back:latest"
+    container_name: flight-backend
+    ports:
+      - "8080:8080"
+  flightapp-ui:
+    image: "flightapp-ui:latest"
+    container_name: flight-ui
+    ports:
+      - "3000:3000"
