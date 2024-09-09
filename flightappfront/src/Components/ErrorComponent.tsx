@@ -1,5 +1,5 @@
 import { Button } from "@mui/material";
-import { ErrorResponse, isRouteErrorResponse, Link, useNavigate, useRouteError } from "react-router-dom";
+import { ErrorResponse, Link, useRouteError } from "react-router-dom";
 
 export default function ErrorComponent(){
 
