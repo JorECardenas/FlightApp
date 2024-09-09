@@ -22,7 +22,7 @@ import com.google.gson.stream.JsonWriter;
 import io.swagger.client.model.OriginalFlightStop;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.IOException;
-import org.threeten.bp.OffsetDateTime;
+import java.time.LocalDateTime;
 /**
  * details of stops for direct or change of gauge flights
  */
@@ -31,12 +31,12 @@ import org.threeten.bp.OffsetDateTime;
 
 public class FlightStop extends OriginalFlightStop {
   @SerializedName("arrivalAt")
-  private OffsetDateTime arrivalAt = null;
+  private LocalDateTime arrivalAt = null;
 
   @SerializedName("departureAt")
-  private OffsetDateTime departureAt = null;
+  private LocalDateTime departureAt = null;
 
-  public FlightStop arrivalAt(OffsetDateTime arrivalAt) {
+  public FlightStop arrivalAt(LocalDateTime arrivalAt) {
     this.arrivalAt = arrivalAt;
     return this;
   }
@@ -46,15 +46,15 @@ public class FlightStop extends OriginalFlightStop {
    * @return arrivalAt
   **/
   @Schema(description = "arrival at the stop in [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) YYYY-MM-ddThh:mm:ss format, e.g. 2017-02-10T20:40:00")
-  public OffsetDateTime getArrivalAt() {
+  public LocalDateTime getArrivalAt() {
     return arrivalAt;
   }
 
-  public void setArrivalAt(OffsetDateTime arrivalAt) {
+  public void setArrivalAt(LocalDateTime arrivalAt) {
     this.arrivalAt = arrivalAt;
   }
 
-  public FlightStop departureAt(OffsetDateTime departureAt) {
+  public FlightStop departureAt(LocalDateTime departureAt) {
     this.departureAt = departureAt;
     return this;
   }
@@ -64,11 +64,11 @@ public class FlightStop extends OriginalFlightStop {
    * @return departureAt
   **/
   @Schema(description = "departure from the stop in [ISO8601](https://en.wikipedia.org/wiki/ISO_8601) YYYY-MM-ddThh:mm:ss format, e.g. 2017-02-10T20:40:00")
-  public OffsetDateTime getDepartureAt() {
+  public LocalDateTime getDepartureAt() {
     return departureAt;
   }
 
-  public void setDepartureAt(OffsetDateTime departureAt) {
+  public void setDepartureAt(LocalDateTime departureAt) {
     this.departureAt = departureAt;
   }
 

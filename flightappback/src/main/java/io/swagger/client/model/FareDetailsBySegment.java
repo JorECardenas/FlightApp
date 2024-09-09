@@ -12,6 +12,7 @@
 
 package io.swagger.client.model;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Arrays;
 import com.google.gson.TypeAdapter;
@@ -62,6 +63,9 @@ public class FareDetailsBySegment {
 
   @SerializedName("sliceDiceIndicator")
   private SliceDiceIndicator sliceDiceIndicator = null;
+
+  @SerializedName("amenities")
+  private List<Amenity> amenities = null;
 
   public FareDetailsBySegment additionalServices(AdditionalServicesRequest additionalServices) {
     this.additionalServices = additionalServices;
@@ -242,6 +246,12 @@ public class FareDetailsBySegment {
   public void setSliceDiceIndicator(SliceDiceIndicator sliceDiceIndicator) {
     this.sliceDiceIndicator = sliceDiceIndicator;
   }
+
+  /**
+   * Get amenity list
+   * @return amenities
+   **/
+  public List<Amenity> getAmenities(){ return amenities; }
 
 
   @Override

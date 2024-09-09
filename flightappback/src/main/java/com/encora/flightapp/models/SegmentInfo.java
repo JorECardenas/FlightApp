@@ -1,5 +1,6 @@
 package com.encora.flightapp.models;
 
+import io.swagger.client.model.Dictionaries;
 import io.swagger.client.model.Itineraries;
 import io.swagger.client.model.Segment;
 import io.swagger.client.model.TravelerPricing;
@@ -28,11 +29,11 @@ public class SegmentInfo {
     //String flightNumber;
 
 
-    //String carrier;
+    String carrier;
 
     //String aircraftType;
 
-    List<TravelerFare> fares;
+    List<FlightInfo> flights;
 
     List<FlightStop> stops;
 
@@ -40,7 +41,8 @@ public class SegmentInfo {
 
 
 
-    public SegmentInfo(Itineraries segment, List<TravelerPricing> pricings, Map<String,AirportDictionaryItem> dict){
+    public SegmentInfo(Itineraries segment, List<TravelerPricing> pricings, Map<String,AirportDictionaryItem> dict, Dictionaries dicts){
+
 
         time = segment.getDuration();
 
@@ -65,6 +67,17 @@ public class SegmentInfo {
 
         //arrAirport = dict.get(segment.getSegments().getLast().getArrival().getIataCode()).getCity() + " (" + segment.getSegments().getLast().getArrival().getIataCode() +")";
 
+        flights = new ArrayList<>();
+
+        for(Segment seg: segment.getSegments()){
+            flights.add(new FlightInfo(seg, dict, dicts));
+        }
+
+        if(dicts.getCarriers().get(segment.getSegments().getFirst().getCarrierCode()) == null){
+            carrier = segment.getSegments().getFirst().getCarrierCode();
+        }else {
+            carrier = dicts.getCarriers().get(segment.getSegments().getFirst().getCarrierCode()) + " (" + segment.getSegments().getFirst().getCarrierCode()+")";
+        }
 
         stops = new ArrayList<>();
 
@@ -89,7 +102,6 @@ public class SegmentInfo {
 
         }
 
-        fares = new ArrayList<>();
 
 
 

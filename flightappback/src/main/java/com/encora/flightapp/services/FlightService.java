@@ -184,10 +184,9 @@ public class FlightService {
 
         for (FlightOffer offer : data) {
 
-            flights.add(new FlightDetails(offer, airports));
+            flights.add(new FlightDetails(offer, airports, dicts));
 
         }
-
 
         return flights;
 

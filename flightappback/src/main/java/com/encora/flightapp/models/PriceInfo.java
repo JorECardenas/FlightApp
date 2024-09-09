@@ -1,11 +1,13 @@
 package com.encora.flightapp.models;
 
 import io.swagger.client.model.ExtendedPrice;
+import io.swagger.client.model.FareDetailsBySegment;
 import io.swagger.client.model.Price;
 import io.swagger.client.model.TravelerPricing;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -16,9 +18,11 @@ public class PriceInfo {
 
     Float totalPrice;
 
-    Float fees;
+    List<Fee> fees;
 
     Float pricePerTraveler;
+
+    List<TravelerFare> fares;
 
     public PriceInfo(ExtendedPrice priceInfo, List<TravelerPricing> travelerPricings){
 
@@ -31,9 +35,20 @@ public class PriceInfo {
         pricePerTraveler = totalPrice / travelerPricings.size();
 
 
+        fares = new ArrayList<>();
+
+        for(FareDetailsBySegment pricing: travelerPricings.getFirst().getFareDetailsBySegment()){
+
+            fares.add(new TravelerFare(pricing));
+
+        }
 
 
+        fees = new ArrayList<>();
 
+        for(io.swagger.client.model.Fee f: priceInfo.getFees()){
+            fees.add(new Fee(f));
+        }
 
     }
 

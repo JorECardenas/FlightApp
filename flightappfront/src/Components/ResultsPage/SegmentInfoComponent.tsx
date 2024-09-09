@@ -37,6 +37,7 @@ export default function SegmentInfoComponent({ segment }: IProps) {
 
                 <p>{segment.depAirport + " - " + segment.arrAirport} </p>
 
+                <p>{segment.carrier}</p>
 
             </div>
 

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { NavLink, useActionData } from "react-router-dom"
+import { NavLink, useActionData, Link } from "react-router-dom"
 import TripOption from "./TripOption";
 import { FlightDetails } from "../../Models/FlightModels/FlightDetails";
 
@@ -24,7 +24,9 @@ export default function ResultsComponent() {
             <div className="flex flex-col gap-3 p-4">
 
                 {data.map((item: FlightDetails, key: number) => (
-                    <TripOption data={item} key={key} />
+                    <Link to={"/details"} state={item} key={key}>
+                        <TripOption data={item} key={key} />
+                    </Link>
                 ))}
             </div>
         </div>

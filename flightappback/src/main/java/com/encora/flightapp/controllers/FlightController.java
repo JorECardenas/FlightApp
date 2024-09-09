@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.web.client.RestClientBuilderConfigurer;
 import org.springframework.boot.autoconfigure.web.format.DateTimeFormatters;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -41,7 +42,7 @@ public class FlightController {
         flightService = _flightService;
     }
 
-
+    @Cacheable("flightOffers")
     @GetMapping("/getFlights")
     public List<FlightDetails> getFlightData(@RequestParam String DepAirport,
                                              @RequestParam String ArrAirport,

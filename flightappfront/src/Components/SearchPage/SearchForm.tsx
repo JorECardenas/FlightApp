@@ -27,6 +27,7 @@ export default function SearchForm() {
                             label="Departure Airport"
                             name="depAirport"
                             placeholder="Departure Airport"
+                            required
                         />
                     )}
                 />
@@ -41,6 +42,7 @@ export default function SearchForm() {
                             id={"arrAir"}
                             name="arrAirport"
                             placeholder="Arrival Airport"
+                            required
                         />
                     )}
                 />
@@ -68,12 +70,14 @@ export default function SearchForm() {
                     label="Number of adults"
                     name="numAdults"
                     type="number"
+                    required
                 />
 
                 <TextField
                     label="Currency"
                     name="currency"
                     placeholder="Currency"
+                    required
                 />
 
                 <div className="flex flex-row w-full items-center justify-center">

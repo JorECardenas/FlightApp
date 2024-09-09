@@ -1,5 +1,6 @@
 package com.encora.flightapp.models;
 
+import io.swagger.client.model.Dictionaries;
 import io.swagger.client.model.FlightOffer;
 import io.swagger.client.model.Itineraries;
 import lombok.Data;
@@ -18,7 +19,7 @@ public class FlightDetails {
     PriceInfo priceInfo;
 
 
-    public FlightDetails(FlightOffer offer, Map<String,AirportDictionaryItem> dict){
+    public FlightDetails(FlightOffer offer, Map<String,AirportDictionaryItem> airportDict, Dictionaries dicts){
 
         id = offer.getId();
 
@@ -26,7 +27,7 @@ public class FlightDetails {
 
         for(Itineraries it: offer.getItineraries()){
 
-            segments.add(new SegmentInfo(it, offer.getTravelerPricings(), dict));
+            segments.add(new SegmentInfo(it, offer.getTravelerPricings(), airportDict, dicts));
 
         }
 
