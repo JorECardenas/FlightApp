@@ -31,9 +31,12 @@ public class TravelerFare {
 
         ammenities = new ArrayList<>();
 
-        for(Amenity am: fare.getAmenities()){
-            ammenities.add(new Ammenity(am));
+        if(fare.getAmenities() != null){
+            for(Amenity am: fare.getAmenities()){
+                ammenities.add(new Ammenity(am));
+            }
         }
+
 
 
 

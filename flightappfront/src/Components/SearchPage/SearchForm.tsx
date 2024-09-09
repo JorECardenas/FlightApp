@@ -9,14 +9,17 @@ import data from "../../Models/Data/airlineData.json"
 
 export default function SearchForm() {
 
+    const currencyOptions = ["USD", "MXN", "EUR"]
 
     const [depDate, setDepDate] = useState<Dayjs>(dayjs())
 
     const [arrDate, setArrDate] = useState<Dayjs>(dayjs().add(1, 'day'))
 
+
+
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <Form method="post" action="/results" className="container flex flex-col gap-2 p-3">
+            <Form method="get" action="/results" className="container flex flex-col gap-2 p-3">
 
                 <Autocomplete
                     disablePortal
@@ -73,11 +76,20 @@ export default function SearchForm() {
                     required
                 />
 
-                <TextField
-                    label="Currency"
-                    name="currency"
-                    placeholder="Currency"
-                    required
+
+
+                <Autocomplete
+                    disablePortal
+                    options={currencyOptions}
+                    renderInput={(params) => (
+                        <TextField
+                            {...params}
+                            label="Currency"
+                            name="currency"
+                            placeholder="Currency"
+                            required
+                        />
+                    )}
                 />
 
                 <div className="flex flex-row w-full items-center justify-center">

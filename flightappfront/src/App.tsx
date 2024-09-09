@@ -11,56 +11,11 @@ const callAPILoader = async ({ request }:any) => {
 
   console.log("Calling API")
 
-  let data = await request.url.searchParams();
-
-  let depAirport = data.get("depAirport") as string
-  let arrAirport = data.get("arrAirport") as string
-
-  const regex = /\((.*)\)/
+  let searchUrl = new URL(request.url)
 
 
-
-  const params2 = {
-    DepAirport: depAirport.match(regex)?.pop(),
-    ArrAirport: arrAirport.match(regex)?.pop(),
-    DepDate: data.get("depDate"),
-    ArrDate: data.get("arrDate"),
-    NumAdults: data.get("numAdults"),
-    Currency: data.get("currency"),
-    NonStop: data.get("nonStop"),
-
-  }
-
-  console.log(params2)
-
-
-  let res = await axios({
-      method: 'get',
-      url: url,
-      params: params2
-    })
-    .then((response) => {
-      console.log("Got data", response)
-      return response.data;
-    }).catch((e) => {
-      return e;
-    })
-
-    console.log("Still here", res)
-
-    return res;
-}
-
-const callAPI = async ({ request }:any) => {
-
-  const url = "http://localhost:8080/getFlights"
-
-  console.log("Calling API")
-
-  let data = await request.formData();
-
-  let depAirport = data.get("depAirport") as string
-  let arrAirport = data.get("arrAirport") as string
+  let depAirport = searchUrl.searchParams.get("depAirport") as string
+  let arrAirport = searchUrl.searchParams.get("arrAirport") as string
 
   const regex = /\((.*)\)/
 
@@ -69,11 +24,11 @@ const callAPI = async ({ request }:any) => {
   const params2 = {
     DepAirport: depAirport.match(regex)?.pop(),
     ArrAirport: arrAirport.match(regex)?.pop(),
-    DepDate: data.get("depDate"),
-    ArrDate: data.get("arrDate"),
-    NumAdults: data.get("numAdults"),
-    Currency: data.get("currency"),
-    NonStop: data.get("nonStop"),
+    DepDate: searchUrl.searchParams.get("depDate"),
+    ArrDate: searchUrl.searchParams.get("arrDate"),
+    NumAdults: searchUrl.searchParams.get("numAdults"),
+    Currency: searchUrl.searchParams.get("currency"),
+    NonStop: searchUrl.searchParams.get("nonStop"),
 
   }
 
@@ -104,15 +59,22 @@ const router = createBrowserRouter([
     element: <SearchComponent />
   },
   {
-    id: 'results',
-    path: '/results',
-    action: callAPI,
-    element: <ResultsComponent />,
-
-  },
-  {
-    path: '/details',
-    element: <DetailsComponent />
+    id: "results",
+    path:'/results',
+    loader: callAPILoader,
+    shouldRevalidate: (req) => {
+      return req.currentUrl.pathname === "" || req.currentUrl.search === req.nextUrl.search
+    },
+    children: [
+      {
+        index: true,
+        element: <ResultsComponent/>
+      },
+      {
+        path:"details",
+        element: <DetailsComponent/>
+      }
+    ]
   }
 ])
 

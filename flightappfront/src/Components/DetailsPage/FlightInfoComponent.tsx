@@ -10,7 +10,7 @@ interface IProps {
 export default function FlightInfoComponent({ flight, fare }: IProps) {
 
     return (
-        <div className="border border-black p-3 w-full flex flex-row">
+        <div className="border border-black p-3 w-full flex flex-row gap-2">
 
             <div className="p-3">
 
@@ -23,7 +23,7 @@ export default function FlightInfoComponent({ flight, fare }: IProps) {
 
             </div>
 
-            <div className="border border-black p-3">
+            <div className="border border-black p-3 flex flex-col ga-2">
                 <h4>Fare details</h4>
 
                 <p>Cabin: {fare.cabin}</p>

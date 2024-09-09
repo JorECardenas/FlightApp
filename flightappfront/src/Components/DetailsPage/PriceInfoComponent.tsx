@@ -7,7 +7,7 @@ interface IProps {
 export default function PriceInfoComponent({prices}:IProps){
 
     return (
-        <div className="p-3">
+        <div className="p-3 flex flex-col border border-black gap-2">
                 <h4>Price Breakdown</h4>
 
                 <p>Base Price: {prices.basePrice}</p>
