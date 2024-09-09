@@ -45,7 +45,7 @@ public class FlightService {
     //private String API_URL = "https://242b3e58-84fd-435b-ba58-5b7589261386.mock.pstmn.io";
     private final String API_URL = "https://test.api.amadeus.com";
 
-    @Value("${api.credential.secret")
+    @Value("${api.credential.secret}")
     private String CLIENT_SECRET;
 
     @Value("${api.credential.id}")
@@ -77,8 +77,8 @@ public class FlightService {
 
         MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
         requestBody.add("grant_type", "client_credentials");
-        requestBody.add("client_id", "ni6eYBIZ7R0GsESEYwolDtPlIn0rD8GD");
-        requestBody.add("client_secret", "aGjopDNeMnJA0bRJ");
+        requestBody.add("client_id", CLIENT_ID);
+        requestBody.add("client_secret", CLIENT_SECRET);
 
         RestTemplate restTemplate = new RestTemplate();
 

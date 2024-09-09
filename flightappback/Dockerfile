@@ -1,10 +1,22 @@
-FROM openjdk:22-jdk
-LABEL authors="jorgecardenas"
+FROM eclipse-temurin:22 AS builder
 
-ARG JAR_FILE=build/libs/flightapp-0.0.1-SNAPSHOT.jar
+WORKDIR /app
 
-COPY ${JAR_FILE} flightapp.jar
+COPY gradlew gradlew
+COPY gradle gradle
 
-ENTRYPOINT ["java", "-jar", "/flightapp.jar"]
+COPY . .
+
+RUN chmod +x gradlew
+
+RUN ./gradlew clean build
+
+FROM eclipse-temurin:22
+
+WORKDIR /app
+
+COPY --from=builder /app/build/libs/*.jar app.jar
 
 EXPOSE 8080
+
+ENTRYPOINT ["java", "-jar", "app.jar"]
