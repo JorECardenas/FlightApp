@@ -17,13 +17,15 @@ public class FlightInfo {
     String id;
 
     String carrier;
+    String operatedBy;
+
+    String flightNumber;
 
     LocalDateTime depDate;
     LocalDateTime arrDate;
 
     String depAirport;
     String arrAirport;
-
 
     String duration;
 
@@ -37,6 +39,25 @@ public class FlightInfo {
         }
         else{
             carrier = dicts.getCarriers().get(seg.getCarrierCode()) + " (" + seg.getCarrierCode() +")";
+        }
+
+        if(seg.getOperating() == null){
+            operatedBy = null;
+        }
+        else if(dicts.getCarriers().get(seg.getOperating().getCarrierCode()) == null){
+            operatedBy = dicts.getCarriers().get(seg.getOperating().getCarrierCode());
+        }
+        else {
+            operatedBy = dicts.getCarriers().get(seg.getOperating().getCarrierCode()) + " (" + seg.getOperating().getCarrierCode() +")";
+        }
+
+
+
+        if(dicts.getAircraft().get(seg.getNumber()) == null){
+            flightNumber = seg.getNumber();
+        }
+        else {
+            flightNumber = dicts.getAircraft().get(seg.getNumber());
         }
 
         depDate = seg.getDeparture().getAt();

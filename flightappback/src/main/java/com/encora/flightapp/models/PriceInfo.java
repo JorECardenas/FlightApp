@@ -18,11 +18,15 @@ public class PriceInfo {
 
     Float totalPrice;
 
+    String currency;
+
+    TravelerPrice pricePerTraveler;
+
     List<Fee> fees;
 
-    Float pricePerTraveler;
 
     List<TravelerFare> fares;
+
 
     public PriceInfo(ExtendedPrice priceInfo, List<TravelerPricing> travelerPricings){
 
@@ -31,8 +35,10 @@ public class PriceInfo {
 
         fees = null;
 
+        currency = priceInfo.getCurrency();
 
-        pricePerTraveler = totalPrice / travelerPricings.size();
+
+        pricePerTraveler = new TravelerPrice(travelerPricings.getFirst());
 
 
         fares = new ArrayList<>();

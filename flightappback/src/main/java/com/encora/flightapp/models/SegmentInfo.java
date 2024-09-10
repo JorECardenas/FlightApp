@@ -24,14 +24,9 @@ public class SegmentInfo {
     String depAirport;
     String arrAirport;
 
-    //String airline;
-
-    //String flightNumber;
-
-
     String carrier;
 
-    //String aircraftType;
+    List<String> operated;
 
     List<FlightInfo> flights;
 
@@ -46,55 +41,32 @@ public class SegmentInfo {
 
         time = segment.getDuration();
 
-        depDate = segment.getSegments().getFirst().getDeparture().getAt();
-
-        arrDate = segment.getSegments().getLast().getArrival().getAt();
-
-        if(dict.get(segment.getSegments().getFirst().getDeparture().getIataCode()) == null){
-            depAirport = segment.getSegments().getFirst().getDeparture().getIataCode();
-        }else {
-            depAirport = dict.get(segment.getSegments().getFirst().getDeparture().getIataCode()).getCity() + " (" + segment.getSegments().getFirst().getDeparture().getIataCode() +")";
-
-        }
-
-        if(dict.get(segment.getSegments().getLast().getArrival().getIataCode()) == null){
-            arrAirport = segment.getSegments().getLast().getArrival().getIataCode();
-        }else {
-            arrAirport = dict.get(segment.getSegments().getLast().getArrival().getIataCode()).getCity() + " (" + segment.getSegments().getLast().getArrival().getIataCode() +")";
-
-        }
-
-
-        //arrAirport = dict.get(segment.getSegments().getLast().getArrival().getIataCode()).getCity() + " (" + segment.getSegments().getLast().getArrival().getIataCode() +")";
-
         flights = new ArrayList<>();
 
         for(Segment seg: segment.getSegments()){
             flights.add(new FlightInfo(seg, dict, dicts));
         }
 
-        if(dicts.getCarriers().get(segment.getSegments().getFirst().getCarrierCode()) == null){
-            carrier = segment.getSegments().getFirst().getCarrierCode();
-        }else {
-            carrier = dicts.getCarriers().get(segment.getSegments().getFirst().getCarrierCode()) + " (" + segment.getSegments().getFirst().getCarrierCode()+")";
-        }
+        depDate = flights.getFirst().getDepDate();
+        arrDate = flights.getLast().getArrDate();
+
+        depAirport = flights.getFirst().getDepAirport();
+        arrAirport = flights.getLast().getArrAirport();
+
+        carrier = flights.getFirst().getCarrier();
+
+        operated = flights.stream().map(FlightInfo::getCarrier).toList();
+
+
 
         stops = new ArrayList<>();
 
-        for(int i = 1; i <= segment.getSegments().size() - 1; i++){
+        for(int i = 1; i <= flights.size() - 1; i++){
 
-            String airport = segment.getSegments().get(i).getDeparture().getIataCode();
+            String airport = flights.get(i).getDepAirport();
 
-            if(dict.get(segment.getSegments().get(i).getDeparture().getIataCode()) != null){
-                airport = dict.get(segment.getSegments().get(i).getDeparture().getIataCode()).getCity() + " (" + segment.getSegments().get(i).getDeparture().getIataCode() +")";
-
-            }
-
-            //String airport = dict.get(segment.getSegments().get(i).getDeparture().getIataCode()).getCity() + " (" + segment.getSegments().getFirst().getDeparture().getIataCode() +")";
-
-
-            LocalDateTime start = segment.getSegments().get(i - 1).getArrival().getAt();
-            LocalDateTime end = segment.getSegments().get(i).getDeparture().getAt();
+            LocalDateTime start = flights.get(i - 1).getArrDate();
+            LocalDateTime end = flights.get(i).getDepDate();
 
             Duration diff = Duration.between(start, end);
 

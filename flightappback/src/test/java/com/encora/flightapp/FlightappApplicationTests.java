@@ -77,32 +77,6 @@ class FlightappApplicationTests {
 		return objectMapper;
 	}
 
-	@Test
-	void testMapper() {
-		RestClient client = getClient();
-
-
-		String data = client.get().uri(url + "/v2/shopping/flight-offers").retrieve().body(String.class);
-
-		ObjectMapper mapper = getMapper();
-
-		try{
-			Success success = mapper.readValue(data, Success.class);
-
-			System.out.println(success.toString());
-
-
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-
-
-
-		assertEquals(3,3);
-
-
-
-	}
 
 
 

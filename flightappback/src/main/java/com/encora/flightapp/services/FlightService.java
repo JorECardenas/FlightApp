@@ -55,7 +55,7 @@ public class FlightService {
 
     private Instant expires = Instant.now();
 
-    private final int MAX_FLIGHTS = 5;
+    private final int MAX_FLIGHTS = 100;
 
     private final RestClient client;
 

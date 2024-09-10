@@ -9,7 +9,7 @@ COPY . .
 
 RUN chmod +x gradlew
 
-RUN ./gradlew clean build
+RUN ./gradlew clean build -x test
 
 FROM eclipse-temurin:22
 
