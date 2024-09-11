@@ -23,24 +23,6 @@ export default function ResultsComponent() {
     const [sortedData, setSortedData] = useState<FlightDetails[]>([])
     const [orderFilter, setOrderFilter] = useState({ priceASC: true, durASC: true, priceFirst: true })
 
-    
-    useEffect(() => {
-
-        setSortedData(handleSort(data))
-        
-        let start = 10 * (page - 1)
-        let end = Math.min(sortedData.length, start + 10)
-        
-        setPaginatedData(sortedData.slice(10 * (page - 1), (end)))
-        
-    }, [page, sortedData, orderFilter])
-    
-    useEffect(() => {
-        console.log("In comp: ", data)
-
-        setSortedData(handleSort(data))
-
-    }, [data, orderFilter])
 
     const handleSort = (data: FlightDetails[]) => {
 
@@ -81,30 +63,46 @@ export default function ResultsComponent() {
 
     }
 
+    useEffect(() => {
+
+        setSortedData(handleSort(data))
+
+        let start = 10 * (page - 1)
+        let end = Math.min(sortedData.length, start + 10)
+
+        setPaginatedData(sortedData.slice(10 * (page - 1), (end)))
+
+    }, [page, sortedData, orderFilter, data])
+
 
     if (data.length === 0) {
 
         return (
-            <div className="w-ful h-full p-5 flex fllex-col bg-cyan text-black">
+            <div className="w-ful h-full p-5 flex flex-col bg-cyan text-black items-center gap-3">
 
-                <h1>No flights were found</h1>
-
-                <p>No flight were found for this search:</p>
+                <h1 className="text-5xl font-bold mt-5 mb-5">No flights were found</h1>
 
 
-                <p>Departure Airport: {search.DepAirport}</p>
-                <p>Arrival Airport: {search.ArrAirport}</p>
 
-                <p>Departure Date: {search.DepDate}</p>
+                <div className="text-xl bg-white border-2 border-black rounded-md p-3">
 
-                {
-                    search.ArrDate !== "" ?
-                        <p>Arrival Date: {search.ArrDate}</p>
-                        : <></>
-                }
+                    <p className="text-2xl mb-3 font-bold">No flight were found for this search:</p>
 
+
+                    <p><b>Departure Airport:</b> {search.DepAirport}</p>
+                    <p><b>Arrival Airport:</b> {search.ArrAirport}</p>
+
+                    <p><b>Departure Date:</b> {search.DepDate}</p>
+
+                    {
+                        search.ArrDate !== "" ?
+                            <p><b>Arrival Date:</b> {search.ArrDate}</p>
+                            : <></>
+                    }
+
+                </div>
                 <NavLink to={"/"}>
-                    <button className="rounded h-10 bg-blue text-white">
+                    <button className="rounded h-14 bg-blue text-xl text-white p-3">
                         Return to search
                     </button>
                 </NavLink>

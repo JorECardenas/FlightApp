@@ -24,7 +24,8 @@ export default function FlightInfoComponent({ flight, fare }: IProps) {
 
 
                     <p>{flight.carrier}</p>
-                    <p>Operated by: {flight.operatedBy}</p>
+
+                    <p>{flight.operatedBy !== null ? "Operated by: " + flight.operatedBy : ""}</p>
 
                     <p>Flight number: {flight.flightNumber}</p>
 

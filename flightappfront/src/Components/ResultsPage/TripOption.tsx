@@ -16,7 +16,7 @@ export default function TripOption({data}:IProps ){
     }
 
     return (
-        <div className="border-2 border-black rounded flex flex-row gap-5 bg-white h-40">
+        <div className="border-2 border-black rounded flex flex-row gap-5 bg-white h-fit">
             <div className="w-3/4 border-r border-dashed border-black">
                 {data.segments.map((seg, key) => (
                     <SegmentInfoComponent segment={seg} key={key} />

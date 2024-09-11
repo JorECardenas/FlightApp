@@ -21,7 +21,7 @@ export default function DetailsComponent() {
             <button className="rounded h-10 w-fit bg-blue text-white p-2 mb-3"
                 onClick={() => navigate(-1)}
             >
-                Return to search
+                Return to results
             </button>
 
             <TripOption data={state} />

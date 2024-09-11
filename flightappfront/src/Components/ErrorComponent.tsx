@@ -1,5 +1,5 @@
 import { Button } from "@mui/material";
-import { ErrorResponse, Link, useRouteError } from "react-router-dom";
+import { ErrorResponse, Link, NavLink, useRouteError } from "react-router-dom";
 
 export default function ErrorComponent(){
 
@@ -10,16 +10,16 @@ export default function ErrorComponent(){
 
 
     return (
-        <div>
-            <h2>Sorry, something went wrong</h2>
+        <div className="w-full h-full p-5 bg-cyan text-black flex flex-col items-center">
+            <h2 className="text-5xl font-bold mt-5 mb-5">Sorry, something went wrong</h2>
 
-            <p>{JSON.stringify(error.data)}</p>
+            <p className="text-2xl mb-5">Plase try again with different parameters</p>
 
-
-
-            <Link to={"/"}>
-                <Button>Return to search</Button>
-            </Link>
+            <NavLink to={"/"}>
+                <button className="rounded h-10 bg-blue text-white p-2 h-12 mb-5 text-2xl text-center">
+                    Return to search
+                </button>
+            </NavLink>
 
 
 
