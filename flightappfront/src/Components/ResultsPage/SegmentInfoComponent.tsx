@@ -13,7 +13,7 @@ export default function SegmentInfoComponent({ segment }: IProps) {
     dayjs.extend(duration);
     dayjs.extend(relativeTime)
 
-    const getTimeString = (date: string): string=> {
+    const getTimeString = (date: string): string => {
 
         const formated = dayjs.duration(date)
 
@@ -29,21 +29,23 @@ export default function SegmentInfoComponent({ segment }: IProps) {
 
     return (
 
-        <div className="flex flex-row gap-5 border border-black">
+        <div className="container flex flex-row gap-5 p-3">
 
-            <div>
+            <div className="w-1/2 flex flex-col justify-between">
+                <div>
 
-                <p>{dayjs(segment.depDate).format("DD/MM/YYYY HH:mm")} - {dayjs(segment.arrDate).format("DD/MM/YYYY HH:mm")}</p>
+                    <p className="font-bold">{dayjs(segment.depDate).format("DD/MM/YYYY HH:mm")} - {dayjs(segment.arrDate).format("DD/MM/YYYY HH:mm")}</p>
 
-                <p>{segment.depAirport + " - " + segment.arrAirport} </p>
+                    <p>{segment.depAirport + " - " + segment.arrAirport} </p>
+                </div>
 
-                <p>{segment.carrier}</p>
+                <p className="mt-5">{segment.carrier}</p>
 
             </div>
 
-            <div>
+            <div className="w-1/2">
 
-                <p>{getTimeString(segment.time) + (segment.stops.length > 0 ? "( " + segment.stops.length + " stops)" : "")}</p>
+                <p className="font-bold mb-2">{getTimeString(segment.time) + (segment.stops.length > 0 ? " ( " + segment.stops.length + " stops)" : "")}</p>
 
                 {segment.stops.map((stop, key) => (
                     <p key={key}>{getTimeString(stop.time)} in {stop.airport}</p>

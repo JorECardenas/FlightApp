@@ -5,6 +5,7 @@ import ResultsComponent from './Components/ResultsPage/ResultsComponent';
 import axios from 'axios';
 import DetailsComponent from './Components/DetailsPage/DetailsComponent';
 import ErrorComponent from './Components/ErrorComponent';
+import { LoaderData, SearchComponentData } from './Models/SearchModel';
 
 const callAPILoader = async ({ request }: any) => {
 
@@ -31,7 +32,13 @@ const callAPILoader = async ({ request }: any) => {
 
   }
 
-  //console.log(params2)
+  const SearchData:SearchComponentData = {
+    DepAirport: depAirport,
+    ArrAirport: arrAirport,
+    DepDate: searchUrl.searchParams.get("depDate"),
+    ArrDate: searchUrl.searchParams.get("arrDate"),
+    NumAdults: searchUrl.searchParams.get("numAdults"),
+  }
 
 
   let res = await axios({
@@ -40,15 +47,18 @@ const callAPILoader = async ({ request }: any) => {
     params: params2
   })
     .then((response) => {
-      console.log("Got data", response)
-      return response.data;
+      
+      const res:LoaderData = { data: response.data, search: SearchData }
+      console.log("Got data", res)
+
+      return res;
     }).catch((e) => {
 
 
       throw json({error: e})
     })
 
-  //console.log("Still here", res)
+  console.log("Still here", res)
 
 
 

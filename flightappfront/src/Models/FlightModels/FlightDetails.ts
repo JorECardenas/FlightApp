@@ -14,6 +14,8 @@ export interface SegmentInfo {
 
     carrier: string;
 
+    operated: string[];
+
     flights: FlightInfo[];
 
     stops: FlightStop[];
@@ -24,6 +26,8 @@ export interface SegmentInfo {
 export interface FlightInfo {
     id: string;
     carrier: string;
+    operatedBy: string;
+    flightNumber: string;
     depDate: Date;
     arrDate: Date;
     depAirport: string;
@@ -48,17 +52,23 @@ export interface FlightStop {
     time: string;
 }
 
+export interface TravelerPrice {
+    basePrice: number;
+    totalPrice: number;
+    fareOption: string;
+}
 
 export interface PriceInfo {
-    basePrice: number | null;
-    totalPrice: number | null;
+    basePrice: number;
+    totalPrice: number;
+    currency: string;
+    pricePerTraveler: TravelerPrice;
     fees: Fee[];
-    pricePerTraveler: number | null;
     fares: TravelerFare[];
 
 }
 
 export interface Fee {
     name: string;
-    amount: number | null;
+    amount: number;
 }

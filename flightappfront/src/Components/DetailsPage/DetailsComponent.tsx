@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom"
 import { FlightDetails, TravelerFare } from "../../Models/FlightModels/FlightDetails";
 import PriceInfoComponent from "./PriceInfoComponent";
 import FlightInfoComponent from "./FlightInfoComponent";
-import { Button } from "@mui/material";
+import TripOption from "../ResultsPage/TripOption";
 
 interface ILocation {
     state: FlightDetails;
@@ -16,17 +16,25 @@ export default function DetailsComponent() {
 
 
     return (
-        <div className="container p-3 w-full">
+        <div className="p-3 w-full flex flex-col bg-cyan">
 
-            <Button onClick={() => navigate(-1)}>Return to results</Button>
+            <button className="rounded h-10 w-fit bg-blue text-white p-2 mb-3"
+                onClick={() => navigate(-1)}
+            >
+                Return to search
+            </button>
 
-            <div className="flex flex-row p-3 container">
+            <TripOption data={state} />
 
-                <div className="p-3 flex flex-col">
+            <div className="flex flex-row p-3">
+
+
+
+                <div className="flex flex-col w-3/4 pr-3">
 
                     {state.segments.map((seg, key) => (
                         <div key={key}>
-                            <h2>Segment {key + 1}</h2>
+                            <h2 className="text-lg mb-2 font-bold">Segment {key + 1}</h2>
 
                             <div className="flex flex-col gap-2">
                                 {seg.flights.map((flight, key) => (

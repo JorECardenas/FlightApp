@@ -176,6 +176,10 @@ public class FlightService {
 
     private List<FlightDetails> parseData(List<FlightOffer> data, Dictionaries dicts) {
 
+        if(data.isEmpty()){
+            return new ArrayList<>();
+        }
+
 
         Map<String,AirportDictionaryItem> airports = getDictionary(dicts);
 

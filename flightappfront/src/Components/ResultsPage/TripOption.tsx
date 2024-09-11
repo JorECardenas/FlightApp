@@ -7,9 +7,17 @@ interface IProps {
 
 export default function TripOption({data}:IProps ){
 
+    const getMoneyString = (price: number) => {
+        function currencyFormat(num:number) {
+            return num.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+        }
+
+        return "$" + currencyFormat(price) + " " + data.priceInfo.currency;
+    }
+
     return (
-        <div className="w-full border border-black rounded p-5 flex flex-row gap-5">
-            <div>
+        <div className="border-2 border-black rounded flex flex-row gap-5 bg-white h-40">
+            <div className="w-3/4 border-r border-dashed border-black">
                 {data.segments.map((seg, key) => (
                     <SegmentInfoComponent segment={seg} key={key} />
                 ))}
@@ -17,11 +25,11 @@ export default function TripOption({data}:IProps ){
 
             </div>
 
-            <div>
+            <div className="p-2">
 
-                <p>${data.priceInfo.totalPrice} total</p>
+                <p className="mb-5">{getMoneyString(data.priceInfo.totalPrice)} <br/> <b>Total</b></p>
 
-                <p>${data.priceInfo.pricePerTraveler} per traveler</p>
+                <p>{getMoneyString(data.priceInfo.pricePerTraveler.totalPrice)} <br/> <b>per traveler</b></p>
 
             </div>
 

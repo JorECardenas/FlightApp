@@ -10,36 +10,47 @@ interface IProps {
 export default function FlightInfoComponent({ flight, fare }: IProps) {
 
     return (
-        <div className="border border-black p-3 w-full flex flex-row gap-2">
+        <div className="border-2 border-black rounded-md p-3 w-full flex flex-row gap-2 bg-white">
 
-            <div className="p-3">
+            <div className="p-3 w-3/4 flex flex-col justify-between">
 
-                <p>{dayjs(flight.depDate).format("DD/MM/YYYY HH:mm")} - {dayjs(flight.arrDate).format("DD/MM/YYYY HH:mm")}</p>
+                <div className="mb-2">
+                    <p className="font-bold">{dayjs(flight.depDate).format("DD/MM/YYYY HH:mm")} - {dayjs(flight.arrDate).format("DD/MM/YYYY HH:mm")}</p>
+
+                    <p>{flight.depAirport} - {flight.arrAirport}</p>
+                </div>
+
+                <div>
 
 
-                <p>{flight.depAirport} - {flight.arrAirport}</p>
+                    <p>{flight.carrier}</p>
+                    <p>Operated by: {flight.operatedBy}</p>
 
-                <p>{flight.carrier}</p>
+                    <p>Flight number: {flight.flightNumber}</p>
+
+
+                </div>
 
             </div>
 
-            <div className="border border-black p-3 flex flex-col ga-2">
-                <h4>Fare details</h4>
+            <div className="border-l-2 border-black p-3 flex flex-col gap-2">
+                <p className="text-lg font-bold mb-2">Fare details</p>
 
-                <p>Cabin: {fare.cabin}</p>
+                <p><b>Cabin:</b> {fare.cabin}</p>
 
-                <h5>Amenities</h5>
-                {fare.ammenities.map((am, key) => (
-                    <div key={key}>
-                        <p>{am.name}</p>
+                {
+                    fare.ammenities.length > 0 ? (
+                        <>
+                            <h5 className="text-md font-bold">Amenities:</h5>
+                            {fare.ammenities.map((am, key) => (
+                                <div key={key}>
+                                    <p> - {am.name} {am.chargeable ? "(chargeable)" : "(not chargeable)"}</p>
 
-                        <p>{am.chargeable ? "Is chargeable" : "Not chargeable"}</p>
-
-
-                    </div>
-                ))}
-
-
+                                </div>
+                            ))}
+                        </>
+                    ) : <></>
+                }
 
 
             </div>

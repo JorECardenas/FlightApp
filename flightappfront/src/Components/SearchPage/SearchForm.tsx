@@ -1,9 +1,9 @@
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import dayjs, { Dayjs } from "dayjs";
+import { Dayjs } from "dayjs";
 import { Form } from "react-router-dom";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { useState } from "react";
-import { Autocomplete, Button, Checkbox, InputLabel, TextField } from "@mui/material";
+import { Autocomplete, Checkbox, InputLabel, TextField } from "@mui/material";
 import data from "../../Models/Data/airlineData.json"
 
 
@@ -11,15 +11,20 @@ export default function SearchForm() {
 
     const currencyOptions = ["USD", "MXN", "EUR"]
 
-    const [depDate, setDepDate] = useState<Dayjs>(dayjs())
+    const [depDate, setDepDate] = useState<Dayjs | undefined>(undefined)
 
-    const [arrDate, setArrDate] = useState<Dayjs>(dayjs().add(1, 'day'))
+    const [arrDate, setArrDate] = useState<Dayjs | undefined>(undefined)
 
+    const [numAdults, setNum] = useState<number | undefined>(undefined)
 
 
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <Form method="get" action="/results" className="container flex flex-col gap-2 p-3">
+            <Form
+                method="get"
+                action="/results"
+                className="rounded  w-1/3 flex flex-col gap-2 p-3 bg-white"
+            >
 
                 <Autocomplete
                     disablePortal
@@ -63,16 +68,20 @@ export default function SearchForm() {
                     label="ArrivalDate"
                     name="arrDate"
                     format="DD-MM-YYYY"
-                    minDate={depDate.add(1, 'day')}
+                    minDate={depDate === undefined ? undefined : depDate.add(1, 'day')}
                     value={arrDate}
                     onChange={(newVal) => newVal && setArrDate(newVal)}
                     disablePast
+
                 />
 
                 <TextField
                     label="Number of adults"
                     name="numAdults"
                     type="number"
+                    value={numAdults}
+                    onChange={(newVal) => setNum(numAdults)}
+                    error={(numAdults !== undefined && numAdults < 0)}
                     required
                 />
 
@@ -103,7 +112,12 @@ export default function SearchForm() {
 
 
 
-                <Button type="submit">Search</Button>
+                <button
+                    type="submit"
+                    className="rounded h-10 bg-blue text-white"
+                >
+                    Search
+                </button>
 
 
 
